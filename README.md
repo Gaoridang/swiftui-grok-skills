@@ -4,10 +4,21 @@ A curated set of **Grok skills** and **canonical starter templates** for bootstr
 
 These tools were built to help you start new projects with strong architecture, safe deployment practices (via feature flags), and solid GitHub hygiene — especially when working heavily with AI coding agents.
 
+## The Fastest Way to Start a New Project
+
+```bash
+# 1. Create the project normally in Xcode (SwiftUI)
+# 2. Then run this single command:
+/setup-swiftui-project
+```
+
+This runs the complete professional sequence in the correct order (`github` → `agents` → `architecture` → `feature-flags`) and leaves you with a production-ready structure + excellent `AGENTS.md` as the single source of truth.
+
 ## The Skills
 
 | Skill | What It Does |
 |-------|--------------|
+| `setup-swiftui-project` | **Recommended entry point.** One-command orchestrator that runs the full sequence (GitHub + AGENTS.md + Architecture + Feature Flags) after you manually create the Xcode project. |
 | `setup-swiftui-github` | Professional GitHub setup: CI workflows, PR/issue templates, Dependabot, `.gitignore`, and contribution guidelines |
 | `setup-swiftui-agents` | Creates `AGENTS.md` as the **central living index** + `docs/` folder. Includes detailed Swift/Xcode build settings (2026) as a linked document so all AI sessions stay consistent |
 | `setup-swiftui-architecture` | Integrates a clean **Feature-Sliced** architecture (`App/`, `Features/`, `Core/`, `DesignSystem/`) into an existing Xcode project |
@@ -41,6 +52,8 @@ Restart Grok after installation.
 After creating a new project in Xcode:
 
 ```bash
+/setup-swiftui-project          # ← Recommended (does everything in order)
+# or run the individual skills manually:
 /setup-swiftui-github
 /setup-swiftui-agents
 /setup-swiftui-architecture
@@ -53,13 +66,12 @@ After creating a new project in Xcode:
 .
 ├── skills/                    # The actual Grok skills (drop these into ~/.grok/skills/)
 │   ├── setup-swiftui-*
-│   └── XCODE_FIRST_GUIDELINES.md
+│   └─ XCODE_FIRST_GUIDELINES.md
 │
-│   starters/                  # High-quality reference implementations
+├── starters/                  # High-quality reference implementations
 │   ├── swiftui-architecture-starter/
-│   └── swiftui-feature-flags-starter/
-│
-│   └── README.md
+│   └─ swiftui-feature-flags-starter/
+└── README.md
 ```
 
 ## Why This Exists
