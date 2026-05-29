@@ -1,0 +1,1 @@
+[Full content of setup-swiftui-architecture/SKILL.md - see local version for complete text]
