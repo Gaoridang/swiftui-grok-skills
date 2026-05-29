@@ -1,117 +1,127 @@
 ---
 name: setup-swiftui-github
-description: Runs after the user has manually created a new iOS SwiftUI project in Xcode (iOS 18+, Swift 6+). Adds professional GitHub configuration (.gitignore, CI, PR/issue templates, Dependabot, README) into the existing project using safe merge/update strategies. Can enhance AGENTS.md with contribution guidelines.
+description: Runs after the user has manually created a new iOS SwiftUI project in Xcode targeting iOS 18+ / Swift 6.3+. Professionally configures GitHub for the project: modern CI (macos-26 + Xcode 26.5 via setup-xcode + caching), .gitignore, PR/issue templates, Dependabot, high-quality README + CONTRIBUTING, and AGENTS.md contribution workflow section. Uses safe merge strategies only. Helps align key Xcode build settings (Swift 6 strict concurrency, deployment target) to 2026 professional recommendations. Xcode-first and idempotent.
 ---
 
 # Setup SwiftUI GitHub (Professional Project Initialization)
 
-**Important**: Before running this skill, read `XCODE_FIRST_GUIDELINES.md`. This skill follows Xcode-first integration rules (merge instead of overwrite, etc.).
+**Important**: Before running this skill, read `XCODE_FIRST_GUIDELINES.md` (from the swiftui-grok-skills package). This skill follows Xcode-first integration rules (merge instead of overwrite, discover existing structure, never delete user work).
 
 ## Important Notes for This Skill
 
-- This skill is **idempotent-friendly** — it should be safe to run multiple times.
-- It will merge into existing `.gitignore` and `AGENTS.md` rather than overwriting.
-- It will not delete any existing files.
+- **Idempotent and safe**: Safe to run multiple times. Merges `.gitignore` and `AGENTS.md`; creates `.github/` and supporting docs only if missing or minimal.
+- **Always respects existing customizations**.
+- **2026 modern baseline**: Targets Swift 6.3 language mode, Xcode 26.5, iOS 18.0 minimum deployment (build against latest SDK), professional GitHub Actions with caching and reliable Xcode selection.
+- References the canonical patterns from https://github.com/Gaoridang/swiftui-grok-skills.
 
 ## Purpose
 
-This skill adds professional GitHub configuration and contribution standards into a project the user has already created in Xcode. It follows the integration rules defined in `XCODE_FIRST_GUIDELINES.md`.
+Add production-grade GitHub configuration and contribution standards to a SwiftUI iOS project the user created manually in Xcode. This is the first skill most people should run after `File > New > Project` for any serious app.
 
-It focuses on the things that matter most for long-term project health:
-- Proper version control hygiene
-- Automated CI that actually catches problems
-- Clear contribution processes
-- Dependency management automation
-- High-quality documentation
+It covers the things that are tedious to get right but have huge long-term payoff:
+- Version control hygiene (`.gitignore` that actually works)
+- Reliable CI that catches real problems without false negatives
+- Clear, low-friction contribution process
+- Automated dependency updates (Dependabot)
+- Living documentation + AGENTS.md integration so future AI sessions and human contributors stay aligned
 
 ## When to Use This Skill
 
-- User just created a new iOS SwiftUI project in Xcode and wants to push it to GitHub immediately
-- User wants professional GitHub setup without spending hours researching best practices
-- User cares about good CI, clean PRs, and maintainable project structure
-- Complements `setup-swiftui-feature-flags` (run both after creating a new project)
+- Right after creating a new SwiftUI project in Xcode 26+ and before the first `git push`
+- When you want GitHub Actions CI that actually works on the latest runners without constant maintenance
+- For solo or small-team projects that still want professional standards
+- Perfect complement to `setup-swiftui-architecture` and `setup-swiftui-feature-flags`
 
-**Do not use** for very large existing repositories without discussion (this skill is optimized for greenfield projects).
+**Avoid** for massive brownfield repos without explicit discussion.
 
 ---
 
 ## Step-by-Step Workflow
 
-### Step 1: Discover the Project (Xcode-First)
+### Step 1: Project Discovery (Xcode-First)
 
-This skill runs after the user has already created the project in Xcode.
-
-- Find the `.xcodeproj` or `.xcworkspace`.
-- Identify the main app target folder and scheme name (very important for CI).
-- Check what already exists:
-  - `.git` folder?
+- Locate the `.xcodeproj` (or `.xcworkspace`).
+- Identify the primary app target name and scheme (usually matches the folder / `AppName.swift`).
+- Inventory existing files:
+  - `.git/` present?
   - `.gitignore`?
-  - `README.md`?
+  - `README.md` (length and quality)?
   - `AGENTS.md`?
-- Read `XCODE_FIRST_GUIDELINES.md` for update/merge rules (especially for `.gitignore` and `README.md`).
+  - Any `.github/` already?
+- Read the local `XCODE_FIRST_GUIDELINES.md` (or the one from the skills package) for merge rules.
 
-Ask the user for the exact scheme name if it's not obvious from the folder structure.
+Ask the user to confirm the scheme name if ambiguous.
 
-### Step 2: Ask Clarifying Questions
+### Step 2: Ask Clarifying Questions (One Message)
 
-Ask the following (can be in one message):
+1. **Scheme / target name** (required for all CI jobs).
+2. Do you want **basic build-only CI** or **full build + unit + UI test** jobs from day one?
+3. Will you use **SwiftLint** and/or **SwiftFormat**? (we can add lint job + config skeletons).
+4. Solo project or do you expect external contributors / PRs?
+5. Should I create or enhance `AGENTS.md` with a "GitHub & Contribution Workflow" section?
+6. Preferred default branch (`main` is strongly recommended and is the default here).
+7. Any existing `.gitignore` or README content you want to preserve at all costs?
 
-1. What is the **app name / scheme name**? (required for CI)
-2. Do you want a basic CI that only **builds**, or also **runs unit + UI tests**?
-3. Do you plan to use **SwiftLint** and/or **SwiftFormat**? (we can include them in CI)
-4. Will this be a **solo project** or do you expect collaborators / contributors?
-5. Do you want me to also update/create an `AGENTS.md` with GitHub contribution guidelines?
-6. Any preference on default branch name? (`main` is strongly recommended)
+Also surface current state (is this repo already initialized/pushed? Any prior CI attempts?).
 
-Also check the current state of the project (does `.git` exist? Is it already pushed? Does `AGENTS.md` exist?).
+### Step 3: Recommended Xcode Build Settings Alignment (Critical for Swift 6+)
 
-### Step 3: Create / Update GitHub Files
+After Xcode project creation, **new projects do not always default to the strictest modern settings**. This skill helps the user set the right values for a professional 2026 SwiftUI codebase (even while the project file may intentionally stay on "loose" defaults during early development per your AGENTS.md conventions).
 
-Follow `XCODE_FIRST_GUIDELINES.md` for update strategy:
+**Recommended settings to apply in Xcode (target Build Settings tab)**:
 
-- Always create `.github/` and its contents (safe to add).
-- **`.gitignore`**: Merge new entries. Never overwrite the user's existing file.
-- **`README.md`**: Only create or lightly enhance if it's missing or very minimal.
-- **AGENTS.md**: Append a "GitHub & Contribution Workflow" section if it exists or the user wants one.
+- **Swift Language Version**: `6.0` (or Swift 6.3 if listed)
+- **iOS Deployment Target**: `18.0` (or `18.6` for slightly more modern baseline while still supporting broad devices)
+- **Strict Concurrency Checking**: `Complete` (enforces data-race safety as errors)
+- **Upcoming Features** / **Approachable Concurrency**: Enable (Yes) — activates `InferSendableFromCaptures`, `NonisolatedNonsendingByDefault`, `InferIsolatedConformances`, etc.
+- **Default Actor Isolation** (for main app target): `Main Actor` (dramatically reduces `@MainActor` boilerplate on UI code while preserving safety)
+- **Swift Compiler - Custom Flags > Other Swift Flags**: Consider adding `-warn-concurrency` during migration if needed
 
-Never delete or heavily modify files the user may have already customized.
+**How to present**:
+- Show the user the exact Build Settings table rows.
+- Provide a one-liner command or note that these can also be set via `xcodebuild` or by editing `project.pbxproj` (advanced users).
+- Remind: "Write all new code using full modern Swift 6+ idioms (actors, structured concurrency, `@MainActor`, `Sendable`) regardless of what the current project settings show. The settings above make the compiler enforce it."
 
-### Step 4: Generate High-Quality Files
+Aligns with the philosophy in the Skylog AGENTS.md: keep Xcode project on defaults for compatibility during dev, but always code to the real Swift 6 target.
 
-Use the templates below (they are modern and well-tested as of 2026).
+### Step 4: Create / Update GitHub Files (Follow XCODE_FIRST_GUIDELINES.md Strictly)
 
-Customize them with the actual app/scheme name.
+- `.github/workflows/`, `PULL_REQUEST_TEMPLATE.md`, `ISSUE_TEMPLATE/`, `dependabot.yml` → safe to create.
+- `.gitignore` → **merge only** (append new high-value entries; never truncate or replace user's existing rules).
+- `README.md` → create only if missing or extremely minimal; otherwise append a small high-signal section.
+- `CONTRIBUTING.md` → create if missing (new in this refreshed skill).
+- `AGENTS.md` → append a `## GitHub & Contribution Workflow` section (ask first if a similar heading already exists).
 
-### Step 5: Handle AGENTS.md (Highly Recommended)
+Never delete files.
 
-If an `AGENTS.md` exists or the user wants one:
-- Add a new section called **"GitHub & Contribution Workflow"**
-- Include guidelines about PRs, conventional commits, CI expectations, etc.
+### Step 5: Generate High-Quality, Up-to-Date 2026 Templates
 
-This connects very well with the feature flags skill.
+Use the templates below. Substitute `{{SCHEME_NAME}}`, `{{APP_NAME}}`, `{{MIN_IOS}}` etc. from answers in Step 2.
 
-### Step 6: Safety, Idempotency & Final Output
+Customize CI based on answers (tests? lint?).
 
-Follow the rules in `XCODE_FIRST_GUIDELINES.md` (especially Safety & Idempotency and User Communication Requirements).
+### Step 6: Safety, Idempotency & Communication
 
-### Step 7: Provide Clear Next Steps
+- Before writing any file, check existence and content length.
+- For merges, show a clear diff or summary of *added* lines.
+- At the end, give the user the exact list of actions taken + next manual steps.
 
-After scaffolding, give the user:
+### Step 7: Post-Skill Next Steps & GitHub Hygiene
 
-1. A clear summary of created vs updated files.
-2. Manual Xcode steps (if any).
-3. Exact commands for git init / first push.
-4. Recommended GitHub repo settings (branch protection, etc.).
-5. How this skill pairs with the architecture and feature flags skills.
+Provide:
+1. Exact `git` commands for init / first commit / push (if not already done).
+2. Recommended GitHub repo settings (branch protection on `main`, required status checks matching the CI jobs you created, "Allow squash merging" preferred).
+3. How to pair this with the architecture and feature-flags skills.
+4. Reminder to commit `Package.resolved` if using SPM.
 
 ---
 
-## File Templates
+## File Templates (Refreshed May 2026)
 
-### 1. .gitignore (Xcode + SwiftUI - Modern 2026 version)
+### 1. .gitignore (Modern Xcode + SwiftUI + Swift 6)
 
 ```gitignore
-## Xcode
+# Xcode
 .DS_Store
 build/
 *.pbxuser
@@ -131,46 +141,41 @@ DerivedData/
 *.dSYM.zip
 *.dSYM
 
-## Swift Package Manager
+# Swift Package Manager
 .build/
 .swiftpm/
+Package.resolved   # Uncomment if you prefer not to commit resolved packages
 
-## CocoaPods
+# CocoaPods / Carthage / fastlane (common even in SPM projects)
 Pods/
-
-## Carthage
 Carthage/Build/
-
-## fastlane
 fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output/
 
-## App Store
+# App Store / Archives
 *.ipa
 *.dSYM.zip
 *.dSYM
 
-## Playgrounds
+# Playgrounds
 timeline.xctimeline
 playground.xcworkspace
 
-## SwiftUI Previews
+# SwiftUI Previews & environment
 *.xcworkspace/xcuserdata/
 
-## Environment & Secrets
+# Secrets & signing (never commit real keys)
 .env
 .env.*
 *.p12
 *.p8
 AuthKey_*.p8
-
-## OS generated files
-Thumbs.db
+*.mobileprovision
 ```
 
-### 2. .github/workflows/ci.yml (Recommended Starting Point)
+### 2. .github/workflows/ci.yml (Professional 2026 Baseline — Primary Recommendation)
 
 ```yaml
 name: CI
@@ -186,138 +191,100 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-test:
     name: Build & Test
-    runs-on: macos-15
-    timeout-minutes: 30
+    runs-on: macos-26
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.3.app
+      - name: Select Xcode 26.5
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26.5'
 
-      - name: Build
-        run: |
-          xcodebuild \
-            -scheme "{{SCHEME_NAME}}" \
-            -destination "platform=iOS Simulator,name=iPhone 16 Pro" \
-            -configuration Debug \
-            build | xcbeautify
+      - name: Cache DerivedData + Swift Packages (irgaly)
+        uses: irgaly/xcode-cache@v1
+        with:
+          key: xcode-${{ runner.os }}-${{ hashFiles('**/*.xcodeproj/**', '**/Package.resolved') }}
 
-      - name: Run Unit Tests
+      - name: Resolve Swift Packages
         run: |
-          xcodebuild \
+          xcodebuild -resolvePackageDependencies \
             -scheme "{{SCHEME_NAME}}" \
-            -destination "platform=iOS Simulator,name=iPhone 16 Pro" \
+            -derivedDataPath ./DerivedData
+
+      - name: Build & Test
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -scheme "{{SCHEME_NAME}}" \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
             -configuration Debug \
-            test | xcbeautify
+            -derivedDataPath ./DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            -parallel-testing-enabled YES \
+            -skipPackagePluginValidation \
+            -skipMacroValidation \
+            | xcbeautify --renderer github-actions
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: xcresult
+          path: ./DerivedData/**/*.xcresult
+          retention-days: 7
 ```
 
-**Note for the agent**: 
-- Ask if they want to include `xcbeautify` (recommended for readable logs).
-- Offer a version without tests first if they have no tests yet.
+**Notes for the agent**:
+- Offer a "build-only, no tests" lighter variant if the project has no tests yet.
+- Ask about adding a separate SwiftLint job (or matrix) if they said yes to linting tools.
+- The `irgaly/xcode-cache` + `maxim-lobanov/setup-xcode` combination is the current community gold standard for reliable, fast SwiftUI CI in 2026.
 
-### 3. .github/PULL_REQUEST_TEMPLATE.md
+### 3. .github/workflows/ci-minimal.yml (Build-Only Alternative)
+
+Provide this when the user chooses the lighter option. It uses the same runner + Xcode selection + caching but only the build step (much faster feedback on PRs).
+
+### 4. .github/PULL_REQUEST_TEMPLATE.md
 
 ```markdown
 ## Description
 
-<!-- Describe your changes in detail -->
+<!-- Describe your changes in detail. Link any related issues. -->
 
 ## Type of Change
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation update
+- [ ] Bug fix (non-breaking)
+- [ ] New feature (non-breaking)
+- [ ] Breaking change
+- [ ] Documentation / CI only
+- [ ] Refactor (no behavior change)
 
 ## How Has This Been Tested?
 
-<!-- Please describe the tests that you ran to verify your changes -->
+<!-- List simulators, test cases, or manual steps. -->
 
 ## Checklist
 
-- [ ] My code follows the style guidelines of this project
-- [ ] I have performed a self-review of my own code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
+- [ ] My code follows the project's style and `AGENTS.md` guidelines
+- [ ] I have performed a self-review
+- [ ] I have added or updated tests (or explained why not needed)
+- [ ] All new and existing tests pass locally and in CI
+- [ ] I have updated documentation where appropriate
+- [ ] No new warnings introduced
 ```
 
-### 4. .github/ISSUE_TEMPLATE/bug_report.md
+### 5. .github/ISSUE_TEMPLATE/bug_report.md and feature_request.md
 
-```markdown
----
-name: Bug report
-about: Create a report to help us improve
-title: '[BUG] '
-labels: bug
-assignees: ''
----
-
-## Describe the bug
-
-A clear and concise description of what the bug is.
-
-## To Reproduce
-
-Steps to reproduce the behavior:
-
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
-
-## Expected behavior
-
-A clear and concise description of what you expected to happen.
-
-## Screenshots
-
-If applicable, add screenshots to help explain your problem.
-
-## Environment
-
-- Device: [e.g. iPhone 16 Pro]
-- iOS Version: [e.g. 18.4]
-- App Version: [e.g. 1.0.0]
-
-## Additional context
-
-Add any other context about the problem here.
-```
-
-### 5. .github/ISSUE_TEMPLATE/feature_request.md
-
-```markdown
----
-name: Feature request
-about: Suggest an idea for this project
-title: '[FEATURE] '
-labels: enhancement
-assignees: ''
----
-
-## Is your feature request related to a problem? Please describe.
-
-A clear and concise description of what the problem is.
-
-## Describe the solution you'd like
-
-A clear and concise description of what you want to happen.
-
-## Describe alternatives you've considered
-
-A clear and concise description of any alternative solutions or features you've considered.
-
-## Additional context
-
-Add any other context or screenshots about the feature request here.
-```
+Keep the high-quality versions from the previous skill (they are still excellent). Minor refresh of environment examples to iPhone 17 / iOS 18+ / Xcode 26.5.
 
 ### 6. .github/dependabot.yml
 
@@ -329,94 +296,102 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    groups:
+      actions:
+        patterns:
+          - "*"
 
-  # Uncomment if you use Swift Package Manager dependencies
+  # Enable when you have SPM dependencies you want auto-updated
   # - package-ecosystem: "swift"
   #   directory: "/"
   #   schedule:
       interval: "weekly"
 ```
 
-### 7. README.md (High-Quality Starter for SwiftUI App)
+### 7. README.md (High-Quality Minimal Starter)
 
 ```markdown
 # {{APP_NAME}}
 
-A modern SwiftUI iOS application built for iOS 18+.
-
-## Features
-
-- Built with Swift 6 and modern SwiftUI
-- Clean architecture with clear separation of concerns
-- [Add your key features here]
+Modern SwiftUI iOS application targeting iOS 18+.
 
 ## Requirements
 
 - iOS 18.0+
-- Xcode 16.3+
-- Swift 6.0+
+- Xcode 26.5+
+- Swift 6.3+
 
 ## Getting Started
 
-1. Clone the repository
-2. Open `{{APP_NAME}}.xcodeproj` in Xcode
-3. Build and run
+1. Clone the repo
+2. Open `{{APP_NAME}}.xcodeproj` in Xcode 26.5
+3. Select the {{SCHEME_NAME}} scheme and run on iPhone 17 Pro simulator (or your device)
 
 ## Project Structure
 
-```
-{{APP_NAME}}/
-├── {{APP_NAME}}/           # Main app target
-├── {{APP_NAME}}Tests/      # Unit tests
-└── {{APP_NAME}}UITests/    # UI tests
-```
+This project follows the Xcode-first + skills approach from https://github.com/Gaoridang/swiftui-grok-skills.
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) (coming soon) or open an issue first to discuss what you would like to change.
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the contribution section in `AGENTS.md`.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT (or your choice)
 ```
 
----
+### 8. CONTRIBUTING.md (New — Recommended)
 
-## AGENTS.md Integration (Optional but Powerful)
+```markdown
+# Contributing to {{APP_NAME}}
 
-If the project uses or will use `AGENTS.md`, append or create a section like this:
+Thank you for your interest!
+
+## Development Setup
+
+1. Xcode 26.5+
+2. Run `/setup-swiftui-github` (or follow the manual steps in the skill) if you haven't already
+3. `git checkout -b feature/your-thing`
+
+## Pull Requests
+
+- Small and focused is strongly preferred
+- All PRs must pass CI
+- Use the PR template
+- Update `AGENTS.md` when making architectural changes
+- Conventional commits appreciated but not required
+
+## Questions?
+
+Open a discussion or issue first for anything non-trivial.
+```
+
+### 9. AGENTS.md GitHub & Contribution Workflow Section (Append)
 
 ```markdown
 ## GitHub & Contribution Workflow
 
-- All work happens on feature branches created from `main`
-- Use conventional commit messages when possible
-- Every PR must pass CI before merging
-- Prefer small, focused PRs over large ones
-- Update `AGENTS.md` when making significant architectural changes
-- Use the PR template — it exists for a reason
+- Work happens on short-lived feature branches from `main`
+- Every PR must pass the CI workflow (build + tests on macos-26 + Xcode 26.5)
+- Prefer small PRs; large refactors should be discussed first
+- Update this `AGENTS.md` when you change architecture, add major dependencies, or modify CI
+- Use the PR and issue templates — they exist to keep context high for both humans and AI agents
+- Run the setup skills (`/setup-swiftui-*`) again after major structural changes if needed
+- Never commit real secrets or provisioning profiles
 ```
 
 ---
 
-## Final Guidance to Give the User
+## Final Guidance the Skill Must Always Give the User
 
-After running the skill, always tell the user:
+At the very end of execution, output a clean summary containing:
 
-- What was created vs what was merged/updated.
-- Any manual Xcode steps needed (rare for this skill, but mention if relevant).
-- The exact commands to initialize git and do the first push.
-- Recommended GitHub repository settings (branch protection rules, etc.).
-- How this skill pairs with `setup-swiftui-architecture` and `setup-swiftui-feature-flags`.
-
----
+- **Files created** (full paths)
+- **Files merged/updated** and exactly what was added
+- **Xcode Build Settings** the user should manually verify/set (with exact values from Step 3)
+- **Git commands** (if the repo is not yet initialized)
+- **GitHub repo settings to configure** after push (branch protection, required checks named after the jobs you created, squash merges)
+- **Next recommended skills**: `/setup-swiftui-architecture` then `/setup-swiftui-feature-flags`
+- **Reminder**: "All new code should be written in full modern Swift 6+ style (strict concurrency, actors, etc.) even if your current `project.pbxproj` shows older defaults. This is intentional per the project AGENTS.md."
 
 **End of Skill**
-```
-
-**Notes for future improvement**:
-- Can add a "release" workflow skeleton later
-- Can add support for `fastlane` if the user wants more advanced CI/CD
-- Can detect if the project already has some GitHub files and only fill gaps
-
-This gives a very strong, practical starting point.
