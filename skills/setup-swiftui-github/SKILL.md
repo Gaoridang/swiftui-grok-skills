@@ -1,6 +1,6 @@
 ---
 name: setup-swiftui-github
-description: Runs after the user has manually created a new iOS SwiftUI project in Xcode targeting iOS 18+ / Swift 6.3+. Professionally configures GitHub for the project: modern CI (macos-26 + Xcode 26.5 via setup-xcode + caching), .gitignore, PR/issue templates, Dependabot, high-quality README + CONTRIBUTING, and AGENTS.md contribution workflow section. Uses safe merge strategies only. Helps align key Xcode build settings (Swift 6 strict concurrency, deployment target) to 2026 professional recommendations. Xcode-first and idempotent.
+description: Runs after the user has manually created a new iOS SwiftUI project in Xcode targeting iOS 18+ / Swift 6.3+. Professionally configures GitHub for the project: modern CI (macos-26 + Xcode 26.5 via setup-xcode + caching), .gitignore, PR/issue templates, Dependabot, high-quality README + CONTRIBUTING, and AGENTS.md contribution workflow section. Uses safe merge strategies only. Xcode-first and idempotent. Pure GitHub hygiene skill — never touches Xcode project files or build settings.
 ---
 
 # Setup SwiftUI GitHub (Professional Project Initialization)
@@ -64,27 +64,7 @@ Ask the user to confirm the scheme name if ambiguous.
 
 Also surface current state (is this repo already initialized/pushed? Any prior CI attempts?).
 
-### Step 3: Recommended Xcode Build Settings Alignment (Critical for Swift 6+)
-
-After Xcode project creation, **new projects do not always default to the strictest modern settings**. This skill helps the user set the right values for a professional 2026 SwiftUI codebase (even while the project file may intentionally stay on "loose" defaults during early development per your AGENTS.md conventions).
-
-**Recommended settings to apply in Xcode (target Build Settings tab)**:
-
-- **Swift Language Version**: `6.0` (or Swift 6.3 if listed)
-- **iOS Deployment Target**: `18.0` (or `18.6` for slightly more modern baseline while still supporting broad devices)
-- **Strict Concurrency Checking**: `Complete` (enforces data-race safety as errors)
-- **Upcoming Features** / **Approachable Concurrency**: Enable (Yes) — activates `InferSendableFromCaptures`, `NonisolatedNonsendingByDefault`, `InferIsolatedConformances`, etc.
-- **Default Actor Isolation** (for main app target): `Main Actor` (dramatically reduces `@MainActor` boilerplate on UI code while preserving safety)
-- **Swift Compiler - Custom Flags > Other Swift Flags**: Consider adding `-warn-concurrency` during migration if needed
-
-**How to present**:
-- Show the user the exact Build Settings table rows.
-- Provide a one-liner command or note that these can also be set via `xcodebuild` or by editing `project.pbxproj` (advanced users).
-- Remind: "Write all new code using full modern Swift 6+ idioms (actors, structured concurrency, `@MainActor`, `Sendable`) regardless of what the current project settings show. The settings above make the compiler enforce it."
-
-Aligns with the philosophy in the Skylog AGENTS.md: keep Xcode project on defaults for compatibility during dev, but always code to the real Swift 6 target.
-
-### Step 4: Create / Update GitHub Files (Follow XCODE_FIRST_GUIDELINES.md Strictly)
+### Step 3: Create / Update GitHub Files (Follow XCODE_FIRST_GUIDELINES.md Strictly)
 
 - `.github/workflows/`, `PULL_REQUEST_TEMPLATE.md`, `ISSUE_TEMPLATE/`, `dependabot.yml` → safe to create.
 - `.gitignore` → **merge only** (append new high-value entries; never truncate or replace user's existing rules).
@@ -94,19 +74,19 @@ Aligns with the philosophy in the Skylog AGENTS.md: keep Xcode project on defaul
 
 Never delete files.
 
-### Step 5: Generate High-Quality, Up-to-Date 2026 Templates
+### Step 4: Generate High-Quality, Up-to-Date 2026 Templates
 
 Use the templates below. Substitute `{{SCHEME_NAME}}`, `{{APP_NAME}}`, `{{MIN_IOS}}` etc. from answers in Step 2.
 
 Customize CI based on answers (tests? lint?).
 
-### Step 6: Safety, Idempotency & Communication
+### Step 5: Safety, Idempotency & Communication
 
 - Before writing any file, check existence and content length.
 - For merges, show a clear diff or summary of *added* lines.
 - At the end, give the user the exact list of actions taken + next manual steps.
 
-### Step 7: Post-Skill Next Steps & GitHub Hygiene
+### Step 6: Post-Skill Next Steps & GitHub Hygiene
 
 Provide:
 1. Exact `git` commands for init / first commit / push (if not already done).
@@ -388,10 +368,9 @@ At the very end of execution, output a clean summary containing:
 
 - **Files created** (full paths)
 - **Files merged/updated** and exactly what was added
-- **Xcode Build Settings** the user should manually verify/set (with exact values from Step 3)
 - **Git commands** (if the repo is not yet initialized)
 - **GitHub repo settings to configure** after push (branch protection, required checks named after the jobs you created, squash merges)
-- **Next recommended skills**: `/setup-swiftui-architecture` then `/setup-swiftui-feature-flags`
-- **Reminder**: "All new code should be written in full modern Swift 6+ style (strict concurrency, actors, etc.) even if your current `project.pbxproj` shows older defaults. This is intentional per the project AGENTS.md."
+- **Next recommended skills**: `/setup-swiftui-architecture`, `/setup-swiftui-agents`, then `/setup-swiftui-feature-flags`
+- High-level reminder: Write new code using modern Swift 6+ idioms (the detailed build settings recommendations now live in the AGENTS.md skill).
 
 **End of Skill**
