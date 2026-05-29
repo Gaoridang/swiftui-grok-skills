@@ -9,6 +9,7 @@ These tools were built to help you start new projects with strong architecture, 
 | Skill | What It Does |
 |-------|--------------|
 | `setup-swiftui-github` | Professional GitHub setup: CI workflows, PR/issue templates, Dependabot, `.gitignore`, and contribution guidelines |
+| `setup-swiftui-agents` | Creates `AGENTS.md` as the **central living index** + `docs/` folder. Includes detailed Swift/Xcode build settings (2026) as a linked document so all AI sessions stay consistent |
 | `setup-swiftui-architecture` | Integrates a clean **Feature-Sliced** architecture (`App/`, `Features/`, `Core/`, `DesignSystem/`) into an existing Xcode project |
 | `setup-swiftui-feature-flags` | Adds a production-grade, type-safe **LaunchDarkly** feature flag system with excellent SwiftUI ergonomics and testing support |
 
@@ -41,6 +42,7 @@ After creating a new project in Xcode:
 
 ```bash
 /setup-swiftui-github
+/setup-swiftui-agents
 /setup-swiftui-architecture
 /setup-swiftui-feature-flags
 ```
@@ -53,11 +55,11 @@ After creating a new project in Xcode:
 │   ├── setup-swiftui-*
 │   └── XCODE_FIRST_GUIDELINES.md
 │
-├── starters/                  # High-quality reference implementations
+│   starters/                  # High-quality reference implementations
 │   ├── swiftui-architecture-starter/
 │   └── swiftui-feature-flags-starter/
 │
-└── README.md
+│   └── README.md
 ```
 
 ## Why This Exists
@@ -67,7 +69,7 @@ Starting new SwiftUI projects with good practices (especially when using AI agen
 - Clean, maintainable architecture from day one
 - Proper feature flagging discipline (deploy fast, release safely)
 - Professional GitHub setup
-- Strong `AGENTS.md` guidance so future AI sessions stay consistent
+- Strong `AGENTS.md` as the single source of truth (with build settings, contribution rules, and links to all other guidance)
 
 ## Contributing
 
